@@ -7,7 +7,8 @@ public class CameraFollow : MonoBehaviour
 	public bool lockRotation;									//should the camera be fixed at the offset (for example: following behind the player)
 	public float followSpeed = 6;								//how fast the camera moves to its intended position
 	public float inputRotationSpeed = 100;						//how fast the camera rotates around lookTarget when you press the camera adjust buttons
-	public bool mouseFreelook;									//should the camera be rotated with the mouse? (only if camera is not fixed)
+	public bool mouseFreelook;                                  //should the camera be rotated with the mouse? (only if camera is not fixed)
+	public float mouseSensitivity = 2f;
 	public float rotateDamping = 100;							//how fast camera rotates to look at target
 	public GameObject waterFilter;								//object to render in front of camera when it is underwater
 	public string[] avoidClippingTags;							//tags for big objects in your game, which you want to camera to try and avoid clipping with
@@ -24,10 +25,13 @@ public class CameraFollow : MonoBehaviour
 			waterFilter.GetComponent<Renderer>().enabled = false;
 		if(!target)
 			Debug.LogError("'CameraFollow script' has no target assigned to it", transform);
-		
+
 		//don't smooth rotate if were using mouselook
-		if(mouseFreelook)
+		if (mouseFreelook)
+		{
+			Cursor.lockState = CursorLockMode.Locked;
 			rotateDamping = 0f;
+		}
 	}
 	
 	//run our camera functions each frame
@@ -76,9 +80,9 @@ public class CameraFollow : MonoBehaviour
 		if(mouseFreelook)
 		{
 			//mouse look
-			float axisX = Input.GetAxis ("Mouse X") * inputRotationSpeed * Time.deltaTime;
+			float axisX = Input.GetAxis ("Mouse X") * inputRotationSpeed * Time.deltaTime * mouseSensitivity;
 			followTarget.RotateAround (target.position,Vector3.up, axisX);
-			float axisY = Input.GetAxis ("Mouse Y") * inputRotationSpeed * Time.deltaTime;
+			float axisY = 0; // Input.GetAxis ("Mouse Y") * inputRotationSpeed * Time.deltaTime;
 			followTarget.RotateAround (target.position, transform.right, -axisY);
 		}
 		else
