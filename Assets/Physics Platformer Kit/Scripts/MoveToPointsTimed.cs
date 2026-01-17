@@ -26,6 +26,8 @@ public class MoveToPointsTimed : MonoBehaviour
     private Vector3 lastVelocity;
     private Vector3 currentVelocity;
 
+	private float timer = 0;
+
     //setup
     void Awake()
 	{
@@ -63,41 +65,26 @@ public class MoveToPointsTimed : MonoBehaviour
         lastVelocity = currentVelocity = Vector3.zero;
 	}
 	
-	
-	void Update()
-	{
-		//if we've arrived at waypoint, get the next one
-		if(waypoints.Count > 0)
-		{
-			if(!arrived)
-			{
-				if (Time.time > arrivalTime + delay + timeToNext)
-				{
-					arrivalTime = Time.time;
-					arrived = true;
-				}
-			}
-			else
-			{
-				if(Time.time > arrivalTime + delay)
-				{
-					GetNextWP();
-					arrived = false;
-				}
-			}
-		}
-	}
-	
 	//if this is a platform move platforms toward waypoint
 	void FixedUpdate()
-	{
-		if(transform.tag != "Enemy")
+    {
+		timer += Time.fixedDeltaTime;
+        //if we've arrived at waypoint, get the next one
+        if (waypoints.Count > 0)
+        {
+            if (timer > timeToNext + delay)
+            {
+                GetNextWP();
+                timer -= timeToNext + delay;
+            }
+        }
+        if (transform.tag != "Enemy")
 		{
 			if(!arrived && waypoints.Count > 0)
 			{
 				Vector3 lastPosition = transform.position;
 
-				float timePosition = (Time.time - arrivalTime - delay) / timeToNext;
+				float timePosition = Mathf.Clamp01(timer / timeToNext);
 				Vector3 newPos;
 				if (movementType == MoveType.Lerp)
 				{
@@ -147,9 +134,7 @@ public class MoveToPointsTimed : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player" || collision.gameObject.tag == "Enemy")
         {
-            float timePosition = (Time.time + Time.fixedDeltaTime - arrivalTime - delay) / timeToNext;
-			timePosition = (timePosition > 0.001f) ? timePosition : 0;
-			timePosition = Mathf.Clamp01(timePosition);
+            float timePosition = Mathf.Clamp01((Time.fixedDeltaTime + timer) / timeToNext);
             Vector3 nextPos = Vector3.zero;
             if (movementType == MoveType.Lerp)
             {
@@ -161,7 +146,7 @@ public class MoveToPointsTimed : MonoBehaviour
                 nextPos = Vector3.Lerp(waypoints[lastWp].position, waypoints[currentWp].position, timePosition);
             }
 
-			Vector3 deltaVelocity = ((nextPos - transform.position) - currentVelocity) / Time.fixedDeltaTime;
+			Vector3 deltaVelocity = ((nextPos - transform.position) - currentVelocity) / -1;
 			deltaVelocity.y = 0;
 
 			if (deltaVelocity.sqrMagnitude > 1)
@@ -171,8 +156,12 @@ public class MoveToPointsTimed : MonoBehaviour
                     $"nextPos; {nextPos}\n" +
                     $"transform.position; {transform.position}\n" +
                     $"currentVelocity; {currentVelocity}\n" +
-                    $"deltaVelocity; {deltaVelocity}\n" 
+                    $"deltaVelocity; {deltaVelocity}\n" +
 
+                    $"waypoints[lastWp].position; {waypoints[lastWp].position}\n" +
+                    $"waypoints[currentWp].position; {waypoints[currentWp].position}\n" +
+
+                    $"Time.time - arrivalTime; {Time.time - arrivalTime}\n"
                     );
 			}
 
