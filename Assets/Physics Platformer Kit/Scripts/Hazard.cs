@@ -7,7 +7,8 @@ using System.Collections;
 public class Hazard : MonoBehaviour 
 {
 	public float pushForce = 25f;							//how far away from this object to push the victim when they hit this hazard
-	public float pushHeight = 6f;							//how high to push victim when they are hit by this hazard
+	public float pushHeight = 6f;                           //how high to push victim when they are hit by this hazard
+	public Vector3 pushDirection = Vector3.up;
 	public int damage = 1;									//damage to deal to victim when they hit this hazard
 	public bool triggerEnter;								//are we checking for a trigger collision? (ie: hits a child trigger symbolising area of effect)
 	public bool collisionEnter = true;						//are we checking for collider collision? (ie: hits the actual collider of the object)
@@ -33,7 +34,7 @@ public class Hazard : MonoBehaviour
 		foreach(string tag in effectedTags)
 			if(col.transform.tag == tag)
 			{
-				dealDamage.Attack (col.gameObject, damage, pushHeight, pushForce);
+				dealDamage.Attack (col.gameObject, damage, pushHeight, pushForce, pushDirection);
 				if (hitSound)
 				{
 					aSource.clip = hitSound;
@@ -49,7 +50,7 @@ public class Hazard : MonoBehaviour
 			return;
 		foreach(string tag in effectedTags)
 			if(other.transform.tag == tag)
-				dealDamage.Attack (other.gameObject, damage, pushHeight, pushForce);
+				dealDamage.Attack (other.gameObject, damage, pushHeight, pushForce, pushDirection);
 	}
 }
 

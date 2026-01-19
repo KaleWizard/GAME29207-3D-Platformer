@@ -64,7 +64,8 @@ public class CharacterMotor : MonoBehaviour
 		{
 			Quaternion dirQ = Quaternion.LookRotation (dir);
 			Quaternion slerp = Quaternion.Slerp (transform.rotation, dirQ, dir.magnitude * turnSpeed * Time.deltaTime);
-			rigid.MoveRotation(slerp);
+			Quaternion newDir = Quaternion.RotateTowards (transform.rotation, dirQ, dir.magnitude * turnSpeed * Time.deltaTime);
+            rigid.MoveRotation(newDir);
 		}
 	}
 	

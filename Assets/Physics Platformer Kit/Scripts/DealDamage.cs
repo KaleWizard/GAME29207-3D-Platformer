@@ -4,18 +4,25 @@
 public class DealDamage : MonoBehaviour 
 {
 	private Health health;
-	
+
 	//remove health from object and push it
-	public void Attack(GameObject victim, int dmg, float pushHeight, float pushForce)
+	public void Attack(GameObject victim, int dmg, float pushHeight, float pushForce, Vector3 direction)
 	{
-		health = victim.GetComponent<Health>();		
+		health = victim.GetComponent<Health>();
 		//push
-		Vector3 pushDir = (victim.transform.position - transform.position);
-		pushDir.y = 0f;
-		pushDir.y = pushHeight * 0.1f;
+		Vector3 pushDir;
+		if (direction == Vector3.zero)
+		{
+			pushDir = (victim.transform.position - transform.position);
+            pushDir.y = 0f;
+            pushDir.y = pushHeight * 0.1f;
+        } else
+		{
+			pushDir = direction;
+		}
 		if (victim.GetComponent<Rigidbody>() && !victim.GetComponent<Rigidbody>().isKinematic)
 		{
-			victim.GetComponent<Rigidbody>().linearVelocity = new Vector3(0, 0, 0);
+			//victim.GetComponent<Rigidbody>().linearVelocity = new Vector3(0, 0, 0);
 			victim.GetComponent<Rigidbody>().AddForce (pushDir.normalized * pushForce, ForceMode.VelocityChange);
 			victim.GetComponent<Rigidbody>().AddForce (Vector3.up * pushHeight, ForceMode.VelocityChange);
 		}

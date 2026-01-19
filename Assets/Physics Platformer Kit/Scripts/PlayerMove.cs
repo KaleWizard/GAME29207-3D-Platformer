@@ -174,7 +174,7 @@ public class PlayerMove : MonoBehaviour
 						enemyAI = hit.transform.GetComponent<EnemyAI>();
 						enemyAI.BouncedOn();
 						onEnemyBounce ++;
-						dealDamage.Attack(hit.transform.gameObject, 1, 0f, 0f);
+						dealDamage.Attack(hit.transform.gameObject, 1, 0f, 0f, Vector3.zero);
 					}
 					else
 						onEnemyBounce = 0;

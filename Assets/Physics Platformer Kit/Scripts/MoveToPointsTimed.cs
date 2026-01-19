@@ -12,7 +12,7 @@ public class MoveToPointsTimed : MonoBehaviour
 	public CycleType cycleType;                             //stop at final waypoint, loop through waypoints or move back n forth along waypoints
 	public MoveType movementType;
 	
-	public enum CycleType { PlayOnce, Loop, PingPong }
+	public enum CycleType { PlayOnce, Loop, PingPong, StartToEnd }
 	public enum MoveType { Lerp, Ease }
 	private int lastWp;
 	private int currentWp;
@@ -70,7 +70,7 @@ public class MoveToPointsTimed : MonoBehaviour
     {
 		timer += Time.fixedDeltaTime;
         //if we've arrived at waypoint, get the next one
-        if (waypoints.Count > 0)
+        if (waypoints.Count > 1)
         {
             if (timer > timeToNext + delay)
             {
@@ -128,6 +128,19 @@ public class MoveToPointsTimed : MonoBehaviour
 				forward = true;
 			currentWp = (forward) ? currentWp += 1 : currentWp -= 1;
 		}
+
+		if (cycleType == CycleType.StartToEnd)
+		{
+			currentWp++;
+            if (currentWp == waypoints.Count)
+			{
+				lastWp = 0;
+				transform.position = waypoints[0].position;
+				currentWp = 1;
+
+			}
+
+        }
 	}
 
     private void OnCollisionStay(Collision collision)
@@ -146,12 +159,13 @@ public class MoveToPointsTimed : MonoBehaviour
                 nextPos = Vector3.Lerp(waypoints[lastWp].position, waypoints[currentWp].position, timePosition);
             }
 
-			Vector3 deltaVelocity = ((nextPos - transform.position) - currentVelocity) / -1;
+			Vector3 deltaVelocity = ((nextPos - transform.position) - currentVelocity) / Time.fixedDeltaTime;
 			deltaVelocity.y = 0;
 
 			if (deltaVelocity.sqrMagnitude > 1)
 			{
 				Debug.Log(
+                    $"timer; {timer}\n" +
                     $"timePosition; {timePosition}\n" +
                     $"nextPos; {nextPos}\n" +
                     $"transform.position; {transform.position}\n" +
